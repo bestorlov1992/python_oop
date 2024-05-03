@@ -241,16 +241,58 @@
 #         return len(self._coords)
 #     def __abs__(self):
 #         return list(map(abs, self._coords))
+class Operation_desc:
+    __operations = {"add" : "+", "sub" : "-", "mul" : "*", "truediv": "/"}
+    def __set_name__(self, owner, name: str):
+        name = name.strip("_")
+        if name.startswith("r"):
+            self.prefix = 1 
+            name = name[1:]
+        else:
+            self.prefix = 0
+        self.__name = name
+    def __get__(self, instance, owner):
+        def wrap(x):
+            if type(x) is type(instance):
+                x = x.sc
+            elif type(x) is not int:
+                raise ArithmeticError("right operand must be int or like self")
+            op = self.__class__.__operations[self.__name]
+            new_sec = self.get_res_op(op, instance.sc, x)
+            return owner(new_sec)
+        return wrap
+    def get_res_op(self, op, n1, n2):
+        if self.prefix:
+            n1, n2 = n2, n1
+        return int(eval(f"{n1}{op}{n2}"))
 
-
-class Clock:
+class Clock:  
+# __truediv__ /
+# __floordiv__ //
+# __mod__ %
     __DAY = 86_400
+    __add__ = Operation_desc()
+    __sub__ = Operation_desc()
+    __mul__ = Operation_desc()
+    __truediv__ = Operation_desc()
+    __radd__ = Operation_desc()
+    __rsub__ = Operation_desc()
+    __rmul__ = Operation_desc()
+    __rtruediv__ = Operation_desc()    
 
     def __init__(self, sec: int) -> None:
         if not isinstance(sec, int):
             raise TypeError("seconds must be int")
         self.__sc = sec % self.__DAY
-
+        
+    @property
+    def sc(self):
+        return self.__sc
+    @sc.setter
+    def sc(self, sec):
+        self.__sc = sec
+    def __str__(self) -> str:
+        return str(self.__sc)
     def get_time(self):
         s = self.__sc % 60
         m = (self.__sc // 60) % 60
@@ -259,5 +301,9 @@ class Clock:
     @classmethod
     def __get_formated(self, t):
         return str(t).rjust(2, '0')
-tm = Clock(4000)
-print(tm.get_time())
+tm1 = Clock(4)
+print(tm1 / 100)
+print(100 / tm1)
+
+
+
