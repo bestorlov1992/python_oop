@@ -241,69 +241,375 @@
 #         return len(self._coords)
 #     def __abs__(self):
 #         return list(map(abs, self._coords))
-class Operation_desc:
-    __operations = {"add" : "+", "sub" : "-", "mul" : "*", "truediv": "/"}
-    def __set_name__(self, owner, name: str):
-        name = name.strip("_")
-        if name.startswith("r"):
-            self.prefix = 1 
-            name = name[1:]
-        else:
-            self.prefix = 0
-        self.__name = name
-    def __get__(self, instance, owner):
-        def wrap(x):
-            if type(x) is type(instance):
-                x = x.sc
-            elif type(x) is not int:
-                raise ArithmeticError("right operand must be int or like self")
-            op = self.__class__.__operations[self.__name]
-            new_sec = self.get_res_op(op, instance.sc, x)
-            return owner(new_sec)
-        return wrap
-    def get_res_op(self, op, n1, n2):
-        if self.prefix:
-            n1, n2 = n2, n1
-        return int(eval(f"{n1}{op}{n2}"))
+# class Operation_desc:
+#     __operations = {"add": "+", "sub": "-", "mul": "*", "truediv": "/"}
 
-class Clock:  
-# __truediv__ /
-# __floordiv__ //
-# __mod__ %
-    __DAY = 86_400
-    __add__ = Operation_desc()
-    __sub__ = Operation_desc()
-    __mul__ = Operation_desc()
-    __truediv__ = Operation_desc()
-    __radd__ = Operation_desc()
-    __rsub__ = Operation_desc()
-    __rmul__ = Operation_desc()
-    __rtruediv__ = Operation_desc()    
+#     def __set_name__(self, owner, name: str):
+#         name = name.strip("_")
+#         if name.startswith("r"):
+#             self.prefix = 1
+#             name = name[1:]
+#         else:
+#             self.prefix = 0
+#         self.__name = name
 
-    def __init__(self, sec: int) -> None:
-        if not isinstance(sec, int):
-            raise TypeError("seconds must be int")
-        self.__sc = sec % self.__DAY
-        
-    @property
-    def sc(self):
-        return self.__sc
-    @sc.setter
-    def sc(self, sec):
-        self.__sc = sec
-    def __str__(self) -> str:
-        return str(self.__sc)
-    def get_time(self):
-        s = self.__sc % 60
-        m = (self.__sc // 60) % 60
-        h = (self.__sc // 3600) % 24
-        return f"{self.__get_formated(h)}:{self.__get_formated(s)}:{self.__get_formated(m)}"
-    @classmethod
-    def __get_formated(self, t):
-        return str(t).rjust(2, '0')
-tm1 = Clock(4)
-print(tm1 / 100)
-print(100 / tm1)
+#     def __get__(self, instance, owner) -> object:
+#         def wrap(x: object):
+#             if type(x) is type(instance):
+#                 x = x.sc
+#             elif type(x) is not int:
+#                 raise ArithmeticError("right operand must be int or like self")
+#             op = self.__class__.__operations[self.__name]
+#             new_sec = self.get_res_op(op, instance.sc, x)
+#             return owner(new_sec)
+#         return wrap
+
+#     def get_res_op(self, op, n1, n2) -> int:
+#         if self.prefix:
+#             n1, n2 = n2, n1
+#         return int(eval(f"{n1}{op}{n2}"))
 
 
+# class Clock:
+#     # __truediv__ /
+#     # __floordiv__ //
+#     # __mod__ %
+#     __DAY = 86_400
+#     __add__ = Operation_desc()
+#     __sub__ = Operation_desc()
+#     __mul__ = Operation_desc()
+#     __truediv__ = Operation_desc()
+#     __radd__ = Operation_desc()
+#     __rsub__ = Operation_desc()
+#     __rmul__ = Operation_desc()
+#     __rtruediv__ = Operation_desc()
 
+#     def __init__(self, sec: int) -> None:
+#         if not isinstance(sec, int):
+#             raise TypeError("seconds must be int")
+#         self.__sc = sec % self.__DAY
+
+#     @property
+#     def sc(self):
+#         return self.__sc
+
+#     @sc.setter
+#     def sc(self, sec):
+#         self.__sc = sec
+
+#     def __str__(self) -> str:
+#         return str(self.__sc)
+
+#     def get_time(self):
+#         s = self.__sc % 60
+#         m = (self.__sc // 60) % 60
+#         h = (self.__sc // 3600) % 24
+#         return f"{self.__get_formated(h)}:{self.__get_formated(s)}:{self.__get_formated(m)}"
+
+#     @classmethod
+#     def __get_formated(self, t):
+#         return str(t).rjust(2, '0')
+
+#     @classmethod
+#     def __verify_date(cls, other: object) -> int:
+#         if not isinstance(other, (int, cls)):
+#             raise TypeError(f'right value must be int or {cls}')
+#         if type(other) is cls:
+#             other = other.__sc
+#         return other
+
+#     def __eq__(self, __o: object) -> bool:
+#         return self.__sc == self.__verify_date(__o)
+
+#     def __lt__(self, __o: object) -> bool:
+#         return self.__sc < self.__verify_date(__o)
+
+#     def __gt__(self, __o: object) -> bool:
+#         return self.__sc > self.__verify_date(__o)
+
+#     def __ge__(self, __o: object) -> bool:
+#         return self.__sc >= self.__verify_date(__o)
+
+#     def __le__(self, __o: object) -> bool:
+#         return self.__sc <= self.__verify_date(__o)
+
+
+# class Point:
+#     def __init__(self, x, y, colors) -> None:
+#         self.colors = list(colors)
+#         self.x = x
+#         self.y = y
+
+#     def __eq__(self, __o: object) -> bool:
+#         return 1
+
+#     def __hash__(self) -> int:
+#         return hash((self.x, self.y))
+
+#     def __len__(self) -> int:
+#         print("__len__")
+#         return 0
+
+#     def __bool__(self) -> bool:
+#         print("__bool__")
+#         return True
+
+#     def __getitem__(self, item) -> object:
+#         if not isinstance(item, int):
+#             raise TypeError("item nust be int")
+#         if 0 <= item < len(self.colors):
+#             return self.colors[item]
+#         raise IndexError(f"index must be betwen {0} and {len(self.colors)}")
+
+#     def __setitem__(self, item, val):
+#         if not isinstance(item, int):
+#             raise TypeError("item nust be int")
+#         if 0 <= item < len(self.colors):
+#             self.colors[item] = val
+#         else:
+#             offset = item + 1 - len(self.colors)
+#             self.colors.extend([None] * offset)
+#             self.colors.append(val)
+#     def __delitem__(self, item):
+#         if not isinstance(item, int):
+#             raise TypeError("item nust be int")
+#         if 0 <= item < len(self.colors):
+#             del self.colors[item]
+#             return None
+#         raise IndexError(f"index must be betwen {0} and {len(self.colors)}")
+
+# class FRange:
+#     def __init__(self, start: float = 0.0, stop: float = 0.0, step: float = 1.0) -> None:
+#         self.start = start
+#         self.stop = stop
+#         self.step = step
+
+
+#     def __next__(self):
+#         print("next")
+#         if self.value + self.step < self.stop:
+#             self.value += self.step
+#             return self.value
+#         else:
+#             raise StopIteration
+#     def __iter__(self):
+#         print("iter")
+#         self.value = self.start - self.step
+#         return self
+#     def __eq__(self, __o: object) -> bool:
+#         print("eq")
+#         return False
+# class Geom:
+#     def get_pr(self):
+#         raise NotImplementedError("Method must be implemented in offspring (descendand) class")
+
+# class Rect(Geom):
+#     def __init__(self, w, h) -> None:
+#        self.w = w
+#        self.h = h
+#     def get_pr(self):
+#         return 2 * (self.w + self.h)
+
+
+# class Square(Geom):
+#     def __init__(self, a) -> None:
+#        self.a = a
+#     def get_pr(self):
+#         return 4 * self.a
+
+
+# rc1 = Rect(1, 2)
+# rc2 = Rect(3, 4)
+# sq1 = Square(5)
+# sq2 = Square(7)
+
+# geom = [rc1, rc2, sq1, sq2]
+# sq1.get_pr()
+
+
+# class Point2D:
+#     __slots__ = ('x', 'y', '__length')
+
+#     def __init__(self, x, y) -> None:
+#         self.x = x
+#         self.y = y
+#         self.__length = (x * x + y * y) ** 0.5
+
+#     @property
+#     def length(self):
+#         return self.__length
+
+#     @length.setter
+#     def length(self, length):
+#         self.__lenght = length
+
+
+# class Point3D(Point2D):
+#     __slots__ = ('z',)
+
+#     def __init__(self, x, y, z) -> None:
+#         self.x = x
+#         self.y = y
+#         self.z = z
+# import traceback as tb
+# import logging
+
+# def func1():
+#     # print('func1')
+#     try:
+#         func2()
+#     except:
+#         # Can do like this
+#         print(tb.format_exc())
+#         # or like this with logging
+#         logging.exception('text from logger')
+
+# def func2():
+#     # print('func2')
+#     1/0
+
+# class ExceptionSendData (Exception):
+#     '''Class exception for send data'''
+#     def __init__(self, *args: object) -> None:
+#         self.message = args[0] if args else None
+#     def __str__(self) -> str:
+#         return f'Error: {self.message}'
+
+
+# a = 10
+# b = a
+# try:
+#     pass
+# except ExceptionSendData as ex:
+#     print("in ex")
+# finally:
+#     pass
+#     # print('in finally')
+
+# raise ExceptionSendData('text for exception')
+
+# class DefenderVector:
+#     def __init__(self, v) -> None:
+#         self.__v = v
+
+#     def __enter__(self):
+#         self.__temp = self.__v.copy()
+#         return self.__temp
+
+#     def __exit__(self, exc_type, exc_value, exc_tb):
+#         if exc_type is None:
+#             self.__v[:] = self.__temp
+#         return True
+
+# v1 = [1, 2, 3]
+# v2 = [2, 4]
+
+# with DefenderVector(v1) as dv:
+#     for i, v in enumerate(dv):
+#         dv[i] += v2[i]
+
+# a = 10
+
+
+# class Women:
+#     b = a
+#     title = 'object for column title'
+#     photo = 'object for column photo'
+#     ordering = 'object for column ordering'
+
+#     def __init__(self, user, psw) -> None:
+#         self._user = user
+#         self._psw = psw
+#         self.meta = self.Meta(user + '@' + psw)
+
+#     class Meta:
+#         ordering = ['id']
+#         def __init__(self, access) -> None:
+#             self.access = access
+# class A1:
+#     do1 = lambda self, x: x + x
+#     def do():
+#         pass
+# class A2: ...
+
+# def test(self):
+#     pass
+# Point = type('Point', (A1, A2), {'MAX_COORD': 100, 'MIN_COORD': 300, 'method_t' : test})
+
+# def create_class_point(name, bases, attrs: dict):
+#     attrs.update({'MAX_COORD': 100, 'MIN_COORD': 300})
+#     return type(name, bases, attrs)
+
+# class Meta(type):
+#     def __init__(cls, name, bases, attrs):
+#         super().__init__(name, bases, attrs)
+#         cls.MAX_COORD = 100
+#         cls.MIN_COORD = 200
+
+
+# class Point(metaclass=Meta):
+#     def get_coords(self):
+#         return (0, 0)
+# class Meta(type):
+#     def create_local_attrs(self, *args, **kwargs):
+#         for key, value in self.class_attrs.items():
+#             self.__dict__[key] = value
+
+#     def __init__(cls, name, base, attrs):
+#         cls.class_attrs = attrs
+#         cls.__init__ = Meta.create_local_attrs
+
+
+# class Women(metaclass=Meta):
+#     title = 'title'
+#     content = 'contend'
+#     photo = 'photo'
+
+
+# import pprint
+# import dataclasses
+
+
+# class GoodsMethodFactory:
+#     @staticmethod
+#     def get_init_mesure():
+#         return [0, 0, 0]
+
+
+# @dataclasses.dataclass
+# class Thing:
+#     current_uid = 0
+#     uid: int = dataclasses.field(init=False)
+#     descr: str = ""
+#     weight: int = None
+#     price: int = None
+
+#     def __post_init__(self):
+#         type(self).current_uid += 1
+#         self.uid = type(self).current_uid
+
+
+# @dataclasses.dataclass
+# class SubThing(Thing):
+#     title: str = ""
+#     author: str = ""
+#     weight: float = 0
+#     price: float = 0
+#     mesure: list = dataclasses.field(
+#         default_factory=GoodsMethodFactory.get_init_mesure)
+
+#     def __post_init__(self):
+#         super().__post_init__()
+
+
+# th = Thing(1)
+# print(th)
+
+# sth = SubThing('t_descr', 7.7, 199.90, 't_title', 'Sam Smith')
+# print(sth)
+
+# T_Data = dataclasses.make_dataclass('T_Data', [('model', str), ('price'), ('max_speed', int, dataclasses.field(default=0))
+#                                                ], namespace={'get_max_speed': lambda self: self.max_speed}
+#                                     )
+# td = T_Data('cabrio', 1_000_000)
+# print(td.get_max_speed())
